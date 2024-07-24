@@ -1,0 +1,38 @@
+openapi: 3.0.0
+info:
+  title: Example API
+  version: 1.0.0
+
+paths:
+  /example:
+    post:
+      summary: Example endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                optionalObject:
+                  type: object
+                  required:
+                    - requiredProperty
+                  properties:
+                    requiredProperty:
+                      type: string
+                optionalArray:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
