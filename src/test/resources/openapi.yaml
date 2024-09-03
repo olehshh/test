@@ -1,46 +1,143 @@
+---
 openapi: 3.0.2
 info:
-  title: IAC
+  title: syncWithGithub1.1
   description: My API with multiple versions
-  version: 3.0.1
-tags:
-  - name: v1
-    description: Version 1 API
-  - name: v2
-    description: Version 2 API
+  version: 1.0.0
 servers:
-  - url: "https://developer.api.us.stg.walmart.com/api-proxy/service/channelperformance/iac"
-    description: server Base URL
+- url: developer.api.us.stg.walmart.com/api-proxy/service/channelperformance/nrti-sandbox/v1
+  description: server Base URL
+tags:
+- name: sync-v1
+  description: API
 paths:
-  /v1/users:
+  "/store/{storeNbr}/gtin/{gtinValue}/transactionHistory":
     get:
-      summary: Get Data (v1)
+      summary: Transaction History
+      description: This API provides suppliers with the transaction history for their
+        GTINs at our Walmart stores (such as item sales, returns, receiving, etc).
       tags:
-        - v1
+      - sync-v1
       responses:
         '200':
           description: Users list
-  /v2/users:
-    get:
-      summary: Get Data (v2)
+      parameters:
+      - name: storeNbr
+        in: path
+        description: storeNbr for path
+        schema:
+          type: string
+        required: true
+      - name: gtinValue
+        in: path
+        description: gtinValue for path
+        schema:
+          type: string
+        required: true
+      - name: WM_CONSUMER.ID
+        in: header
+        description: consumer id
+        schema:
+          type: string
+        required: true
+      - name: WM_SEC.KEY_VERSION
+        in: header
+        description: version
+        schema:
+          type: string
+        required: true
+      - name: WM_SEC.AUTH_SIGNATURE
+        in: header
+        description: AUTH_SIGNATURE
+        schema:
+          type: string
+        required: true
+      - name: WM_CONSUMER.INTIMESTAMP
+        in: header
+        description: CONSUMER.INTIMESTAMP
+        schema:
+          type: string
+        required: true
+  "/store/inventory/status":
+    post:
       tags:
-        - v2
+      - tags-v1
       responses:
         '200':
-          description: Users list with additional fields
-  /v1/orders:
-    post:
-      summary: Post Data (v1)
-      tags:
-        - v1
-      responses:
-        '201':
-          description: Order created
-  /v2/orders:
-    post:
-      summary: Post Data (v2)
-      tags:
-        - v2
-      responses:
-        '201':
-          description: Order created with additional fields
+          description: Users list
+      summary: Multi Item Inventory
+      description: The Multi Item Store Inventory APIs provide suppliers with near
+        real-time visibility of available inventory at our Walmart stores. Suppliers
+        can use this endpoint to request inventory status information, using either
+        the GTIN or Walmart Item Number, for up to 100 items
+      operationId: getStoreInventory_1
+      parameters:
+      - name: itemIdentifier
+        in: query
+        required: false
+        schema:
+          type: string
+        example: gtin
+      - name: wm_svc.name
+        in: header
+        schema:
+          type: string
+          enum:
+          - channelperformance-nrti
+          - channelperformance-nrti-sandbox
+      - name: wm_svc.env
+        in: header
+        schema:
+          type: string
+      - name: WM_CONSUMER.ID
+        in: header
+        description: consumer id
+        schema:
+          type: string
+        required: true
+      - name: WM_SEC.KEY_VERSION
+        in: header
+        description: version
+        schema:
+          type: string
+        required: true
+      - name: WM_SEC.AUTH_SIGNATURE
+        in: header
+        description: AUTH_SIGNATURE
+        schema:
+          type: string
+        required: true
+      - name: WM_CONSUMER.INTIMESTAMP
+        in: header
+        description: CONSUMER.INTIMESTAMP
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NrtStoreInventoryRequest"
+        required: true
+components:
+  schemas:
+    NrtStoreInventoryRequest:
+      required:
+      - storeNbr
+      type: object
+      properties:
+        storeNbr:
+          type: integer
+          format: int32
+        gtins:
+          type: array
+          items:
+            pattern: "^\\d{14}$"
+            type: string
+        values:
+          type: array
+          items:
+            type: string
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
