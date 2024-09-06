@@ -1,5 +1,9 @@
 inherit: job:///strati/kitt/kitt-build-assets:looper/docker.yml
 
+tools:
+  nodejs: 18.3.0
+  npm: 8.5.5
+ 
 flows:
   build:
     try:
